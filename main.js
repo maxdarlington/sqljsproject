@@ -26,42 +26,54 @@ initSqlJs({ wasmBinary }).then((SQL) => {
   
       reader.readAsArrayBuffer(file);
     });
-  
-    // Apply filters on button click
+
+
+    // FILTERS:
+
+    // Apply filters on button 
     document.getElementById("apply-filters").addEventListener("click", function () {
       const gameFilter = document.getElementById("filter-game").value.trim();
       const playerFilter = parseInt(document.getElementById("filter-players").value.trim(), 10);
-  
+      const filterType = document.getElementById("filter-type").value; // Get the selected filter type
+    
       let query = "SELECT * FROM playerdata";
       const conditions = [];
-  
+    
       if (gameFilter) {
         conditions.push(`game_name LIKE '%${gameFilter}%'`);
       }
+    
       if (!isNaN(playerFilter)) {
-        conditions.push(`Avg_players >= ${playerFilter}`);
+        if (filterType === "min") {
+          conditions.push(`Avg_players >= ${playerFilter}`);
+        } else if (filterType === "max") {
+          conditions.push(`Avg_players <= ${playerFilter}`);
+        }
       }
-  
+    
       if (conditions.length > 0) {
         query += " WHERE " + conditions.join(" AND ");
       }
-  
+    
       try {
         const result = db.exec(query);
-  
+    
         if (result.length === 0 || !result[0].values.length) {
           alert("No data found matching the filters.");
           return;
         }
-  
+    
         renderTable(result[0]); // Re-render the table with filtered data
       } catch (err) {
         console.error("Error applying filters:", err);
         alert("An error occurred while applying filters.");
       }
     });
+    
   
-    // Render table function
+    // RENDER TABLE:
+
+  
     function renderTable(result) {
       const existingTable = document.querySelector("table");
       if (existingTable) {
