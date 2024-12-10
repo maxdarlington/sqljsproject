@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", () => {
     // Apply filters on button click
     const applyFiltersButton = document.getElementById("apply-filters");
     if (!applyFiltersButton) {
-      console.error("#apply-filters element not found. Check your HTML structure.");
+      console.error("#apply-filters element ");
       return;
     }
 
@@ -118,9 +118,20 @@ document.addEventListener("DOMContentLoaded", () => {
       const tbody = document.createElement("tbody");
       result.values.forEach((row) => {
         const tr = document.createElement("tr");
-        row.forEach((value) => {
+        row.forEach((value, index) => {
           const td = document.createElement("td");
-          td.textContent = value;
+    
+          // Check if the column is a URL column
+          if (result.columns[index].toLowerCase().includes("url") && isValidUrl(value)) {
+            const link = document.createElement("a");
+            link.href = value;
+            link.textContent = value;
+            link.target = "_blank"; // Open link in a new tab
+            td.appendChild(link);
+          } else {
+            td.textContent = value; // Render as plain text for non-URL values
+          }
+    
           tr.appendChild(td);
         });
         tbody.appendChild(tr);
@@ -133,6 +144,15 @@ document.addEventListener("DOMContentLoaded", () => {
       document.body.appendChild(wrapper);
     
       generateColumnFilters(result.columns); // Generate filter buttons
+    }    
+    
+    function isValidUrl(value) {
+      try {
+        const url = new URL(value);
+        return url.protocol === "http:" || url.protocol === "https:";
+      } catch (e) {
+        return false;
+      }
     }
     
 
