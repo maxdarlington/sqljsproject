@@ -16,4 +16,15 @@ body {
     font-style: italic;
     color: #ccc;
   }
+
+  .btn-primary {
+    background-color: green !important;
+    color: white !important; /* Text color */
+    border-color: green !important; /* Match border color */
+  }
+  
+  .btn-primary:hover {
+    background-color: darkgreen !important; /* Darker green on hover */
+    border-color: darkgreen !important;
+  }
   
