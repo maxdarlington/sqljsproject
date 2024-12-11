@@ -50,8 +50,7 @@ function executeFilters(db, selectedTable, renderCallback) {
     return;
   }
 
-  // Build query based on selected table and filter conditions
-  let query = `SELECT * FROM ${selectedTable} WHERE ` + filterConditions.join(" AND ");
+  let query = `SELECT * FROM ${selectedTable} WHERE ${filterConditions.join(" AND ")}`;
   try {
     const result = db.exec(query);
     if (result.length === 0 || !result[0].values.length) {
@@ -64,4 +63,5 @@ function executeFilters(db, selectedTable, renderCallback) {
     alert("An error occurred while applying filters.");
   }
 }
+
 

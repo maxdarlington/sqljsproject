@@ -28,6 +28,7 @@ function renderTableSelector(tables, callback) {
 
 
 // Render the table with results
+// Render the table with results
 function renderTable(result) {
   const existingTable = document.querySelector("table");
   if (existingTable) existingTable.remove(); // Remove existing table
@@ -50,9 +51,20 @@ function renderTable(result) {
   const tbody = document.createElement("tbody");
   result.values.forEach((row) => {
     const tr = document.createElement("tr");
-    row.forEach((value) => {
+    row.forEach((value, index) => {
       const td = document.createElement("td");
-      td.textContent = value;
+
+      // Check if the column is "url" (case-insensitive)
+      if (result.columns[index].toLowerCase() === "url" && isValidUrl(value)) {
+        const link = document.createElement("a");
+        link.href = value; // Set the href attribute
+        link.textContent = value; // Display the link text
+        link.target = "_blank"; // Open the link in a new tab
+        td.appendChild(link); // Add the link to the cell
+      } else {
+        td.textContent = value; // Render as plain text for other columns
+      }
+
       tr.appendChild(td);
     });
     tbody.appendChild(tr);
@@ -65,7 +77,7 @@ function renderTable(result) {
   document.body.appendChild(wrapper); // Append table to the document
 }
 
-// Generate column filter buttons
+
 // Generate column filter buttons
 function generateColumnFilters(columns) {
   const filterButtonsContainer = document.getElementById("filter-buttons");
@@ -101,11 +113,18 @@ function generateColumnFilters(columns) {
       maxButton.textContent = `Max ${formatColumnName(colName)}`;
       maxButton.addEventListener("click", () => applyMinMaxFilter(colName, "max"));
       columnButtonGroup.appendChild(maxButton);
+    } else if (isStringColumn(colName)) {
+      // Add Search button for string columns
+      const searchButton = document.createElement("button");
+      searchButton.classList.add("btn", "btn-success", "mb-2");
+      searchButton.textContent = `Search ${formatColumnName(colName)}`;
+      searchButton.addEventListener("click", () => applyStringFilter(colName));
+      columnButtonGroup.appendChild(searchButton);
     } else {
-      // If the column is not numerical, don't add Min/Max buttons
+      // For other column types, add a note
       const infoText = document.createElement("span");
       infoText.classList.add("text-muted");
-      infoText.textContent = "(No min/max filter available)";
+      infoText.textContent = "(No filter available)";
       columnButtonGroup.appendChild(infoText);
     }
 
@@ -114,14 +133,6 @@ function generateColumnFilters(columns) {
   });
 }
 
-// Check if the column is numerical based on name or type
-function isNumericalColumn(colName) {
-  // Here you can add more sophisticated checks (e.g., inspecting column data types)
-  const numericalKeywords = ["count", "avg", "players", "gain", "id"]; // You can add more keywords based on your database
-  return numericalKeywords.some((keyword) => colName.toLowerCase().includes(keyword));
-}
-
-
 // Update the filter display
 function updateFilterDisplay() {
   const filterDisplay = document.getElementById("active-filters");
@@ -129,22 +140,30 @@ function updateFilterDisplay() {
 
   filterDisplay.innerHTML = ""; // Clear existing filters
 
-  filterConditions.forEach((condition, index) => {
-    const filterElement = document.createElement("div");
-    filterElement.classList.add("badge", "bg-info", "text-dark", "me-2");
-    filterElement.textContent = condition;
+  if (filterConditions.length === 0) {
+    const noFilters = document.createElement("span");
+    noFilters.classList.add("text-muted");
+    noFilters.textContent = "No active filters.";
+    filterDisplay.appendChild(noFilters);
+  } else {
+    filterConditions.forEach((condition, index) => {
+      const filterElement = document.createElement("div");
+      filterElement.classList.add("badge", "bg-info", "text-dark", "me-2");
+      filterElement.textContent = condition;
 
-    const removeButton = document.createElement("button");
-    removeButton.classList.add("btn-close", "btn-close-white", "ms-2");
-    removeButton.addEventListener("click", () => {
-      filterConditions.splice(index, 1); // Remove the filter
-      updateFilterDisplay(); // Update display after removal
+      const removeButton = document.createElement("button");
+      removeButton.classList.add("btn-close", "btn-close-white", "ms-2");
+      removeButton.addEventListener("click", () => {
+        filterConditions.splice(index, 1);
+        updateFilterDisplay();
+      });
+
+      filterElement.appendChild(removeButton);
+      filterDisplay.appendChild(filterElement);
     });
-
-    filterElement.appendChild(removeButton);
-    filterDisplay.appendChild(filterElement);
-  });
+  }
 }
+
 
 // Apply min/max filter to a column
 function applyMinMaxFilter(column, type) {
@@ -155,6 +174,18 @@ function applyMinMaxFilter(column, type) {
   }
 
   const condition = `${column} ${type === "min" ? ">=" : "<="} ${value}`;
+  filterConditions.push(condition); // Add to the filterConditions array
+  updateFilterDisplay(); // Update the filter display
+}
+
+function applyStringFilter(column) {
+  const value = prompt(`Enter a search term for ${formatColumnName(column)}:`);
+  if (!value) {
+    alert("Please enter a valid search term.");
+    return;
+  }
+
+  const condition = `${column} LIKE '%${value}%'`; // SQL LIKE clause for partial matching
   filterConditions.push(condition); // Add to the filterConditions array
   updateFilterDisplay(); // Update the filter display
 }

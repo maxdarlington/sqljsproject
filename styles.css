@@ -17,13 +17,13 @@ body {
     color: #ccc;
   }
 
-  .btn-primary {
+  .btn {
     background-color: green !important;
     color: white !important; /* Text color */
     border-color: green !important; /* Match border color */
   }
   
-  .btn-primary:hover {
+  .btn:hover {
     background-color: darkgreen !important; /* Darker green on hover */
     border-color: darkgreen !important;
   }
