@@ -28,7 +28,6 @@ function renderTableSelector(tables, callback) {
 
 
 // Render the table with results
-// Render the table with results
 function renderTable(result) {
   const existingTable = document.querySelector("table");
   if (existingTable) existingTable.remove(); // Remove existing table

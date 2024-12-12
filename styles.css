@@ -1,30 +1,22 @@
-body {
-    font-family: 'Arial', sans-serif;
-    line-height: 1.6;
-  }
-  
-  h1 {
-    font-weight: 700;
-  }
-  
-  .card {
-    border-radius: 8px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
-  }
-  
-  input::placeholder {
-    font-style: italic;
-    color: #ccc;
-  }
+/* Custom Table Styling */
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden; /* Ensure rounded corners */
+  border-radius: 8px; /* Rounded corners */
+}
 
-  .btn {
-    background-color: green !important;
-    color: white !important; /* Text color */
-    border-color: green !important; /* Match border color */
-  }
-  
-  .btn:hover {
-    background-color: darkgreen !important; /* Darker green on hover */
-    border-color: darkgreen !important;
-  }
-  
+thead th {
+  font-size: 1rem;
+  font-weight: bold;
+  text-transform: uppercase;
+}
+
+tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.1); /* Highlight row on hover */
+  transition: background-color 0.3s ease;
+}
+
+td, th {
+  padding: 0.75rem;
+}
